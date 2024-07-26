@@ -21,7 +21,7 @@ class LoginController extends APIController
 
         $response = [
             'token' => $user->createToken('Personal Token')->plainTextToken,
-//            'user' => UserResource::make($user->load('media')),
+            'user' => UserResource::make($user->load('media')),
         ];
 
         return $this->respondWithSuccess($response, __('app.login.success'));

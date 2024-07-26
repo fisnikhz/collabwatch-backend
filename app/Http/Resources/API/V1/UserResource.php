@@ -15,7 +15,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'email' => $this->email,
             'bio' => $this->bio,
-//            'avatar_url' => $this->getFirstMediaUrl('avatars'),
+            'avatar_url' => $this->getFirstMediaUrl('avatar'),
 //            'followers_count' => $this->followers()->count(),
 //            'following_count' => $this->following()->count(),
 //            'videos_count' => $this->videos()->count(),
