@@ -25,7 +25,7 @@ class VideoController extends Controller
         $rand10 = Str::random(10);
 
         $path = $rand10.'thumbnail.jpg';
-        $getThumbnail->export()->toDisk('public')->save($path);
+//        $getThumbnail->export()->toDisk('s3')->save($path);
 
 
         $org_path = Storage::url($path);
@@ -39,7 +39,7 @@ class VideoController extends Controller
         ]);
 
         if ($request->hasFile('video')) {
-            $media = $video->addMediaFromRequest('video')->toMediaCollection('videos');
+            $media = $video->addMediaFromRequest('video')->toMediaCollection('videos','s3');
 
             $media->update([
                 'duration' => $duration,
