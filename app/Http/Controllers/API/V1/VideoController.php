@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\V1\StoreVideoRequest;
 use App\Http\Resources\API\V1\VideoResource;
+use App\Jobs\ProcessVideo;
 use App\Models\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -38,8 +39,12 @@ class VideoController extends Controller
             'description' => $request->description,
         ]);
 
+
+
         if ($request->hasFile('video')) {
             $media = $video->addMediaFromRequest('video')->toMediaCollection('videos','s3');
+
+            ProcessVideo::dispatch($media,$video->id);
 
             $media->update([
                 'duration' => $duration,
