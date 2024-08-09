@@ -13,7 +13,7 @@ class VideoResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'media' => MediaResource::collection($this->whenLoaded('media')),
+            'media' => MediaResource::collection($this->media),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

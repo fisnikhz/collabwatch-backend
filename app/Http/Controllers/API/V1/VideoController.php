@@ -30,7 +30,7 @@ class VideoController extends Controller
 
 
         $org_path = Storage::url($path);
-        $url = env('APP_URL') . $org_path;
+        $url = $org_path;
 
 
         $video = Video::create([
