@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    'recommendation_engine' => [
+        'base_url' => env('recommendation_base_url'),
+    ],
 ];

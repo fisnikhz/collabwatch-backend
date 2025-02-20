@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\API\V1;
+namespace App\Http\Controllers\API\V1\Video;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\APIController;
 use App\Http\Requests\API\V1\StoreVideoRequest;
 use App\Http\Resources\API\V1\VideoResource;
 use App\Jobs\ProcessVideo;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
-class VideoController extends Controller
+class VideoController extends APIController
 {
     public function __invoke(StoreVideoRequest $request): JsonResponse
     {
@@ -26,7 +26,7 @@ class VideoController extends Controller
         $rand10 = Str::random(10);
 
         $path = $rand10.'thumbnail.jpg';
-//        $getThumbnail->export()->toDisk('s3')->save($path);
+        $getThumbnail->export()->toDisk('s3')->save($path);
 
 
         $org_path = Storage::url($path);

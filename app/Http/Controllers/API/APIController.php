@@ -17,11 +17,5 @@ class APIController extends Controller
         if ($perPage = (int) \request('items_per_page')) {
             $this->perPage = min(100, $perPage);
         }
-
-        if ($locale = request()->header('Accept-Language')) {
-            if (in_array($locale, config('app.available_locales'))) {
-                app()->setLocale($locale);
-            }
-        }
     }
 }

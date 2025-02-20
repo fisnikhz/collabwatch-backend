@@ -14,9 +14,9 @@ class StoreVideoRequest extends APIRequest
     public function rules()
     {
         return [
-            'title' => 'string|max:255',
-            'description' => 'nullable|string',
-            'video' => 'file|mimes:mp4,mov,avi,flv|max:50480',
+            'title' => 'required|string|max:255',
+            'description' => 'required|nullable|string',
+            'video' => 'required|file|mimes:mp4,mov,avi,flv|max:50480',
         ];
     }
 }

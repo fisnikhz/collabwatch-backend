@@ -27,4 +27,10 @@ class User extends Authenticatable implements HasMedia
             'password' => 'hashed',
         ];
     }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
+
 }
