@@ -33,4 +33,15 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany(Video::class);
     }
 
+    public function likedVideos()
+    {
+        return $this->belongsToMany(Video::class, 'likes')->withTimestamps();
+    }
+
+    public function savedVideos()
+    {
+        return $this->belongsToMany(Video::class, 'saves')->withTimestamps();
+    }
+
+
 }

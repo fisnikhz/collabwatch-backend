@@ -17,13 +17,24 @@ class Video extends Model implements HasMedia
         'description',
     ];
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('videos');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function registerMediaCollections(): void
+    public function likes()
     {
-        $this->addMediaCollection('videos');
+        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
     }
+
+    public function saves()
+    {
+        return $this->belongsToMany(User::class, 'saves')->withTimestamps();
+    }
+
 }
