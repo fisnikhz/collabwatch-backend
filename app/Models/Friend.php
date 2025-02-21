@@ -10,6 +10,7 @@ class Friend extends Model
 {
     use HasFactory;
 
+    protected $table = 'friend_requests';
     protected $guarded = [];
 
     public function sender(): BelongsTo

@@ -37,4 +37,10 @@ class Video extends Model implements HasMedia
         return $this->belongsToMany(User::class, 'saves')->withTimestamps();
     }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+
 }

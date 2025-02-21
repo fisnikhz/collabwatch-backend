@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\FriendStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -41,6 +42,29 @@ class User extends Authenticatable implements HasMedia
     public function savedVideos()
     {
         return $this->belongsToMany(Video::class, 'saves')->withTimestamps();
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+
+    public function sentFriendRequests()
+    {
+        return $this->hasMany(Friend::class, 'sender_id')->where('status', FriendStatusEnum::PENDING->value);
+    }
+
+    public function receivedFriendRequests()
+    {
+        return $this->hasMany(Friend::class, 'receiver_id')->where('status', FriendStatusEnum::PENDING->value);
+    }
+
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'friends', 'sender_id', 'receiver_id')
+            ->wherePivot('status', FriendStatusEnum::ACCEPTED->value)
+            ->withTimestamps();
     }
 
 
