@@ -21,11 +21,7 @@ class RecommendedVideosService
         if ($response->successful()) {
             $responseJson = $response->json();
 
-            if (array_values($responseJson) === $responseJson) {
-                return array_keys($responseJson);
-            }
-
-            return $responseJson;
+            return array_map(fn($item) => array_key_first($item), $responseJson);
         }
 
         throw new \Exception('Error fetching data from Spring Boot service');
