@@ -4,18 +4,22 @@ namespace App\Http\Resources\API\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class FriendResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
-        return $this->attributes([
-            'id',
-            'sender_id'=>$this->whenLoaded('sender'),
-            'receiver_id' =>$this->whenLoaded('receiver'),
-            'status',
-            'created_at',
-            'updated_at'
-        ])->data;
+        $authUser = Auth::user();
+
+        $friend = $this->sender_id === $authUser->id ? $this->receiver : $this->sender;
+
+        return [
+            'id' => $this->id,
+            'friend' => new UserResource($friend),
+            'status' => $this->status,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

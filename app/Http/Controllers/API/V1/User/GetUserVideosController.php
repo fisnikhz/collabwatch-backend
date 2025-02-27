@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\API\V1\User;
 
 use App\Http\Controllers\API\APIController;
-use App\Http\Resources\API\V1\UserResource;
+use App\Http\Resources\API\V1\VideoResource;
 use App\Http\Services\UserService;
 use App\Models\User;
-use Illuminate\Http\Request;
 
-class FindUserByIdController extends APIController
+class GetUserVideosController extends APIController
 {
     protected $userService;
 
@@ -19,9 +18,8 @@ class FindUserByIdController extends APIController
 
     public function __invoke(User $user)
     {
-        $userFromService =  $this->userService->findUserWithMedia($user);
-
-        return $this->respondWithSuccess(UserResource::make($userFromService));
-
+        $videos = $this->userService->getUserVideos($user);
+        return $this->respondWithSuccess(VideoResource::collection($videos));
     }
+
 }

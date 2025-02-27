@@ -3,38 +3,26 @@
 namespace App\Http\Controllers\API\V1\Feed;
 
 use App\Http\Controllers\API\APIController;
+use App\Http\Services\FeedService;
 use App\Http\Services\RecommendedVideosService;
 use App\Http\Resources\API\V1\VideoResource;
 use App\Models\Video;
 
 class FeedController extends APIController
 {
-    protected $recommendedVideosService;
+    protected RecommendedVideosService $feedService;
 
-    public function __construct(RecommendedVideosService $recommendedVideosService)
+    public function __construct(RecommendedVideosService $feedService)
     {
-        $this->recommendedVideosService = $recommendedVideosService;
+        $this->feedService = $feedService;
     }
 
-    /**
-     * @throws \Exception
-     */
     public function __invoke()
     {
-        $data = ($this->recommendedVideosService)(2);
+        $videoIds = $this->feedService->getPersonalizedFeed(auth()->user()->id);
 
-        $keys = array_map(function ($item) {
-            return array_key_first($item);
-        }, $data);
+        $videos = Video::whereIn('id', $videoIds)->paginate();
 
-        $dataVideosObj = Video::whereIn('id', $keys)->get();
-        $serviceVideos = VideoResource::collection($dataVideosObj);
-
-        $otherVideosObj = Video::whereNotIn('id', $keys)->orderBy('created_at', 'desc')->get();
-        $otherVideos = VideoResource::collection($otherVideosObj);
-
-        $response = $serviceVideos->merge($otherVideos);
-
-        return $this->respondWithSuccess($response, __('app.success'));
+        return $this->respondWithSuccess(VideoResource::collection($videos), __('app.success'));
     }
 }

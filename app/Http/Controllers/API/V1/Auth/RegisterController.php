@@ -12,13 +12,7 @@ class RegisterController extends APIController
 {
     public function __invoke(RegisterRequest $request): JsonResponse
     {
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'bio' => $request->bio,
-        ]);
+        $user = User::create($request->validated());
 
         if ($request->hasFile('avatar')) {
             $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');

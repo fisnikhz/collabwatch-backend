@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 trait APIResponse
@@ -17,6 +18,11 @@ trait APIResponse
         if ($data instanceof LengthAwarePaginator) {
             $response['data'] = $data->items();
             $response['pagination'] = $this->paginator($data);
+        } elseif ($data instanceof AnonymousResourceCollection) {
+            $response['data'] = $data->collection->toArray();
+            if ($data->resource instanceof LengthAwarePaginator) {
+                $response['pagination'] = $this->paginator($data->resource);
+            }
         } else {
             $response['data'] = $data;
         }

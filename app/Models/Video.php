@@ -42,5 +42,9 @@ class Video extends Model implements HasMedia
         return $this->hasMany(Comment::class);
     }
 
+    public function tags()
+    {
+        return $this->hasMany(VideoTag::class, 'video_id');
+    }
 
 }

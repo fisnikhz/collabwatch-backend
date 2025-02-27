@@ -34,7 +34,7 @@ class VideoController extends APIController
 
 
         $video = Video::create([
-            'user_id' => Auth::id(),
+            'user_id' => auth()->user()->id,
             'title' => $request->title,
             'description' => $request->description,
         ]);

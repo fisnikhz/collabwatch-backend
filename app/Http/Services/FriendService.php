@@ -3,24 +3,27 @@
 namespace App\Http\Services;
 
 use App\Enums\FriendStatusEnum;
+use App\Http\Resources\API\V1\FriendResource;
 use App\Models\Friend;
 use App\Models\User;
+use App\Traits\APIResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
 
 class FriendService
 {
+    use APIResponse;
     public function sendRequest(string $friendUsername): JsonResponse
     {
         $sender = Auth::user();
         $receiver = User::where('username', $friendUsername)->first();
 
         if (!$receiver) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return $this->respondWithError('User not found.', 404);
         }
 
         if ($sender->id === $receiver->id) {
-            return response()->json(['message' => 'You cannot send a friend request to yourself.'], 400);
+            return $this->respondWithError('You cannot send a friend request to yourself.');
         }
 
         $existingRequest = Friend::where(function ($query) use ($sender, $receiver) {
@@ -31,7 +34,7 @@ class FriendService
         })->exists();
 
         if ($existingRequest) {
-            return response()->json(['message' => 'Friend request already exists.'], 400);
+            return $this->respondWithError('Friend request already exists.');
         }
 
         $friendRequest = Friend::create([
@@ -40,40 +43,40 @@ class FriendService
             'status' => FriendStatusEnum::PENDING->value,
         ]);
 
-        return response()->json(['message' => 'Friend request sent successfully.', 'friend_request' => $friendRequest], 201);
+        return $this->respondWithSuccess('Friend request sent successfully.', ['friend_request' => $friendRequest], 201);
     }
 
     public function acceptRequest(Friend $friendRequest): JsonResponse
     {
         if ($friendRequest->receiver_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized action.'], 403);
+            return $this->respondWithError('Unauthorized action.', 403);
         }
 
         $friendRequest->update(['status' => FriendStatusEnum::ACCEPTED->value]);
 
-        return response()->json(['message' => 'Friend request accepted.'], 200);
+        return $this->respondWithSuccess('Friend request accepted.');
     }
 
     public function declineRequest(Friend $friendRequest): JsonResponse
     {
         if ($friendRequest->receiver_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized action.'], 403);
+            return $this->respondWithError('Unauthorized action.', 403);
         }
 
         $friendRequest->delete();
 
-        return response()->json(['message' => 'Friend request declined.'], 200);
+        return $this->respondWithSuccess('Friend request declined.');
     }
 
     public function removeFriend(Friend $friend): JsonResponse
     {
         if ($friend->sender_id !== Auth::id() && $friend->receiver_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized action.'], 403);
+            return $this->respondWithError('Unauthorized action.', 403);
         }
 
         $friend->delete();
 
-        return response()->json(['message' => 'Friend removed successfully.'], 200);
+        return $this->respondWithSuccess('Friend removed successfully.');
     }
 
     public function blockUser(User $user): JsonResponse
@@ -93,6 +96,39 @@ class FriendService
             'status' => FriendStatusEnum::BLOCKED->value,
         ]);
 
-        return response()->json(['message' => 'User blocked successfully.'], 200);
+        return $this->respondWithSuccess('User blocked successfully.');
     }
+
+    public function getFriends(): JsonResponse
+    {
+        $authUser = Auth::user();
+
+        $friends = Friend::where(function ($query) use ($authUser) {
+            $query->where('sender_id', $authUser->id)
+                ->where('status', FriendStatusEnum::ACCEPTED->value)
+                ->orWhere('receiver_id', $authUser->id)
+                ->where('status', FriendStatusEnum::ACCEPTED->value);
+        })->with([
+            'sender' => function ($query) {
+                $query->withCount(['friends', 'videos', 'likedVideos']);
+            },
+            'receiver' => function ($query) {
+                $query->withCount(['friends', 'videos', 'likedVideos']);
+            }
+        ])->get();
+
+        return $this->respondWithSuccess([
+            'friends' => FriendResource::collection($friends),
+        ]);
+    }
+
+    public function getFriendRequests()
+    {
+        $authUser = Auth::user();
+
+        return Friend::where(function ($query) use ($authUser) {
+            $query->where('receiver_id', $authUser->id);
+        })->where('status', FriendStatusEnum::PENDING->value)->get();
+    }
+
 }

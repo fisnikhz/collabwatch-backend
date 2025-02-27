@@ -62,7 +62,7 @@ class User extends Authenticatable implements HasMedia
 
     public function friends()
     {
-        return $this->belongsToMany(User::class, 'friends', 'sender_id', 'receiver_id')
+        return $this->belongsToMany(User::class, 'friend_requests', 'sender_id', 'receiver_id')
             ->wherePivot('status', FriendStatusEnum::ACCEPTED->value)
             ->withTimestamps();
     }
